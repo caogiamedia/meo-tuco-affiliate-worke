@@ -1,5 +1,6 @@
+
 {
-  "name": "ai-affiliate-worker",
+  "name": "meo-tuco-affiliate-worker",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,8 +15,7 @@
     "react-dom": "^18.3.1",
     "lucide-react": "^0.468.0",
     "@supabase/supabase-js": "^2.47.10",
-    "@supabase/ssr": "^0.6.1",
-    "openai": "^6.0.0"
+    "@supabase/ssr": "^0.6.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
