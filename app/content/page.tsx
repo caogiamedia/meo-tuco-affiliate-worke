@@ -13,5 +13,5 @@ export default async function ContentPage() {
     .order('created_at', { ascending: false })
     .limit(100);
 
-  return <ContentManager email={user.email ?? ''} initialPosts={data ?? []} loadError={error?.message ?? null} />;
+  return <ContentManager ownerId={user.id} email={user.email ?? ''} initialPosts={data ?? []} loadError={error?.message ?? null} />;
 }

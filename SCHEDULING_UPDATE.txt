@@ -1,0 +1,18 @@
+TUCO CONTENT STUDIO - SCHEDULING UPDATE
+
+What changed:
+- Added a schedule action for approved content posts.
+- Added rescheduling for posts already marked as scheduled.
+- Saves scheduled_at and creates or updates a queued row in publishing_jobs.
+- If the publishing queue write fails, the content post status/date is rolled back.
+- No automatic publishing is performed. Real publishing still requires connected channel accounts and a publishing worker/API integration.
+
+No new Supabase SQL is required. The existing schema already contains content_posts.scheduled_at and public.publishing_jobs.
+
+Files changed:
+- app/content/page.tsx
+- app/content/ui.tsx
+- app/globals.css
+
+Deployment:
+Replace the project files with this ZIP, commit and push to main in GitHub Desktop, then wait for Netlify deployment.

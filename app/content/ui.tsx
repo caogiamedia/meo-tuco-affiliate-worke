@@ -21,7 +21,7 @@ type Post = {
   created_at: string;
   product_id: string | null;
 };
-type Props = { email: string; initialPosts: Post[]; loadError: string | null };
+type Props = { ownerId: string; email: string; initialPosts: Post[]; loadError: string | null };
 type FilterStatus = 'all' | 'pending_approval' | 'approved' | 'scheduled' | 'published' | 'rejected' | 'draft';
 
 const channelNames: Record<string, string> = {
@@ -44,7 +44,7 @@ function statusClass(status: string) {
   return 'cm-status gray';
 }
 
-export default function ContentManager({ email, initialPosts, loadError }: Props) {
+export default function ContentManager({ ownerId, email, initialPosts, loadError }: Props) {
   const router = useRouter();
   const [posts, setPosts] = useState(initialPosts);
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('all');
@@ -56,6 +56,8 @@ export default function ContentManager({ email, initialPosts, loadError }: Props
   const [busyId, setBusyId] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [noticeError, setNoticeError] = useState(false);
+  const [schedulingId, setSchedulingId] = useState<string | null>(null);
+  const [scheduleValue, setScheduleValue] = useState('');
 
   const filtered = useMemo(() => posts.filter(post => {
     const matchesStatus = statusFilter === 'all' || post.status === statusFilter;
@@ -98,6 +100,85 @@ export default function ContentManager({ email, initialPosts, loadError }: Props
       router.refresh();
     }
     setBusyId(null);
+  }
+
+  function localDateTimeValue(value: string | null) {
+    const date = value ? new Date(value) : new Date(Date.now() + 60 *  60 * 1000);
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+  }
+
+  function beginSchedule(post: Post) {
+    setSchedulingId(post.id);
+    setScheduleValue(localDateTimeValue(post.scheduled_at));
+    setNotice('');
+  }
+
+  async function saveSchedule(post: Post) {
+    const scheduledDate = new Date(scheduleValue);
+    if (!scheduleValue || Number.isNaN(scheduledDate.getTime()) || scheduledDate.getTime() <= Date.now()) {
+      setNotice('Vui lòng chọn thời điểm trong tương lai.');
+      setNoticeError(true);
+      return;
+    }
+
+    setBusyId(post.id);
+    setNotice('');
+    const supabase = createClient();
+    const scheduledAt = scheduledDate.toISOString();
+
+    const { error: postError } = await supabase
+      .from('content_posts')
+      .update({ status: 'scheduled', scheduled_at: scheduledAt })
+      .eq('id', post.id);
+
+    if (postError) {
+      setNotice(`Không lưu được lịch đăng: ${postError.message}`);
+      setNoticeError(true);
+      setBusyId(null);
+      return;
+    }
+
+    const { data: existingJob, error: lookupError } = await supabase
+      .from('publishing_jobs')
+      .select('id')
+      .eq('content_post_id', post.id)
+      .eq('status', 'queued')
+      .limit(1)
+      .maybeSingle();
+
+    let jobError = lookupError;
+    if (!jobError && existingJob) {
+      const { error } = await supabase
+        .from('publishing_jobs')
+        .update({ scheduled_at: scheduledAt, channel: post.channel, last_error: null })
+        .eq('id', existingJob.id);
+      jobError = error;
+    } else if (!jobError) {
+      const { error } = await supabase.from('publishing_jobs').insert({
+        owner_id: ownerId,
+        content_post_id: post.id,
+        channel: post.channel,
+        scheduled_at: scheduledAt,
+        status: 'queued',
+      });
+      jobError = error;
+    }
+
+    if (jobError) {
+      await supabase.from('content_posts').update({ status: post.status, scheduled_at: post.scheduled_at }).eq('id', post.id);
+      setNotice(`Bài chưa được đưa vào hàng đợi: ${jobError.message}`);
+      setNoticeError(true);
+      setBusyId(null);
+      return;
+    }
+
+    setPosts(current => current.map(item => item.id === post.id ? { ...item, status: 'scheduled', scheduled_at: scheduledAt } : item));
+    setSchedulingId(null);
+    setNotice('Đã lưu lịch và đưa bài viết vào hàng đợi xuất bản. Hệ thống chưa tự đăng khi chưa kết nối tài khoản kênh.');
+    setNoticeError(false);
+    setBusyId(null);
+    router.refresh();
   }
 
   async function changeStatus(post: Post, nextStatus: 'approved' | 'rejected') {
@@ -199,9 +280,17 @@ export default function ContentManager({ email, initialPosts, loadError }: Props
                     <div className="cm-post-heading"><div><span className="cm-channel-name">{channelNames[post.channel] ?? post.channel}</span><span className={statusClass(post.status)}>{statusNames[post.status] ?? post.status}</span></div><small>Tạo lúc {dateLabel(post.created_at)} · Định dạng: {post.format || 'post'}</small></div>
                     <div className="cm-post-actions">
                       {post.status === 'pending_approval' && <><button className="cm-action approve" disabled={busyId === post.id} onClick={() => changeStatus(post, 'approved')}><Check size={15} /> Duyệt</button><button className="cm-action reject" disabled={busyId === post.id} onClick={() => changeStatus(post, 'rejected')}><X size={15} /> Từ chối</button></>}
+                      {(post.status === 'approved' || post.status === 'scheduled') && <button className="cm-action schedule" disabled={busyId === post.id} onClick={() => schedulingId === post.id ? setSchedulingId(null) : beginSchedule(post)}><Clock3 size={15} /> {post.status === 'scheduled' ? 'Đổi lịch' : 'Lên lịch'}</button>}
                       <button className="cm-action edit" onClick={() => editing === post.id ? setEditing(null) : beginEdit(post)}><Pencil size={15} /> {editing === post.id ? 'Đóng' : 'Chỉnh sửa'}</button>
                     </div>
                   </div>
+
+                  {schedulingId === post.id && (
+                    <div className="cm-scheduler">
+                      <label>Thời gian dự kiến đăng<input type="datetime-local" value={scheduleValue} min={localDateTimeValue(new Date().toISOString())} onChange={event => setScheduleValue(event.target.value)} /></label>
+                      <div><small>Tuco sẽ lưu bài vào hàng đợi. Việc đăng thực tế cần kết nối và cấp quyền cho tài khoản kênh.</small><button className="cm-action save" disabled={busyId === post.id} onClick={() => saveSchedule(post)}><Clock3 size={15} /> {busyId === post.id ? 'Đang lưu...' : 'Lưu lịch đăng'}</button></div>
+                    </div>
+                  )}
 
                   {editing === post.id ? (
                     <div className="cm-editor">

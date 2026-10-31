@@ -260,3 +260,12 @@
 @media(max-width:1000px){.tc-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.tc-layout{grid-template-columns:1fr}.tc-list-card{min-height:unset}.tc-task-list{max-height:380px}.tc-detail-card{min-height:unset}}
 @media(max-width:800px){.tc-hero{min-height:205px;padding:25px}.tc-hero-cat{right:2%;width:145px;height:145px;opacity:.8}.tc-hero>div:first-child{max-width:75%}.tuco-topbar-right{gap:7px}.tuco-nav-link{font-size:0;padding:9px}.tuco-nav-link svg{width:16px;height:16px}}
 @media(max-width:520px){.tc-hero{min-height:220px;padding:20px}.tc-hero h1{font-size:23px}.tc-hero>div:first-child{max-width:100%;padding-right:35px}.tc-hero-cat{right:-30px;width:125px;height:125px;opacity:.42}.tc-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.tc-stats>div{min-height:78px;padding:10px;grid-template-columns:32px 1fr;column-gap:7px}.tc-stat-icon{width:32px;height:32px}.tc-stats strong{font-size:18px}.tc-list-card,.tc-detail-card{padding:13px}.tc-toolbar{flex-direction:column}.tc-search,.tc-filter{width:100%}.tc-filter select{max-width:none;flex:1}.tc-task-item{flex-wrap:wrap}.tc-task-copy{min-width:calc(100% - 55px)}.tc-task-item>.tc-status{margin-left:43px}.tc-timeline{grid-template-columns:1fr}.tc-info-grid{grid-template-columns:1fr}.tc-info-grid>div.wide{grid-column:auto}.tc-generated-row{grid-template-columns:60px minmax(0,1fr)}.tc-generated-row a{grid-column:2}.tc-hero-cat>div{display:none}}
+
+
+.cm-action.schedule{background:#fff8ed;border-color:#f5dfbf;color:#b8752b}.cm-action.schedule:hover{background:#fff0d9}
+.cm-scheduler{margin:14px 0 8px 50px;padding:15px 16px;border:1px solid #f0dfce;border-radius:11px;background:#fffaf5;display:flex;flex-direction:column;gap:12px}
+.cm-scheduler label{display:flex;flex-direction:column;gap:7px;color:#68788c;font-size:10px;font-weight:700}
+.cm-scheduler input{max-width:310px;border:1px solid #e1e7ee;border-radius:8px;padding:10px 11px;background:#fff;color:#30445b;font:inherit;font-size:11px}
+.cm-scheduler>div{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cm-scheduler small{color:#8a97a6;font-size:9px;line-height:1.6;max-width:480px}
+@media(max-width:800px){.cm-scheduler{margin-left:0}}
