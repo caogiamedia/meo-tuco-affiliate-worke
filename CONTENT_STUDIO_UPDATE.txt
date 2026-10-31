@@ -1,0 +1,21 @@
+MEO TUCO - CONTENT STUDIO UPDATE
+
+New route:
+- /content : Content management center
+
+Features:
+- List up to 100 content_posts owned by the signed-in user.
+- Filter by channel and status; search title/body.
+- Edit title and body and save to Supabase.
+- Approve/reject pending_approval posts.
+- Synchronize matching pending rows in approvals when possible.
+- Approval does NOT publish to social platforms.
+
+Changed files:
+- app/agent/ui.tsx (added navigation link)
+- app/globals.css (content studio styles)
+- app/content/page.tsx (authenticated server page)
+- app/content/ui.tsx (client content manager)
+
+No database migration is required. Uses existing content_posts and approvals tables from supabase/schema.sql.
+Keep existing Netlify environment variables unchanged.
