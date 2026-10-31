@@ -99,6 +99,7 @@ export default function AgentConsole({ email, products, tasks, posts }: Props) {
           <span><strong>MÈO TUCO</strong><small>KIẾM TIỀN NUÔI SEN !</small></span>
         </Link>
         <div className="tuco-topbar-right">
+          <Link href="/tasks" className="tuco-nav-link"><ListTodo size={15} /> Nhiệm vụ AI</Link>
           <Link href="/content" className="tuco-nav-link"><FileText size={15} /> Quản lý nội dung</Link>
           <div className="tuco-online"><span /> TUCO ĐANG TRỰC TUYẾN</div>
           <div className="tuco-account">

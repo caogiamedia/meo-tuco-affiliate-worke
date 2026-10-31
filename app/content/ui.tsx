@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import {
-  ArrowLeft, Check, CheckCircle2, Clock3, ExternalLink, FileText,
+  ArrowLeft, Check, CheckCircle2, Clock3, ExternalLink, FileText, ListTodo,
   Filter, Globe2, Instagram, Pencil, Save, Search, Send, X, XCircle,
 } from 'lucide-react';
 
@@ -145,6 +145,7 @@ export default function ContentManager({ email, initialPosts, loadError }: Props
         </Link>
         <div className="tuco-topbar-right">
           <Link href="/agent" className="tuco-nav-link"><ArrowLeft size={15} /> Dashboard</Link>
+          <Link href="/tasks" className="tuco-nav-link"><ListTodo size={15} /> Nhiệm vụ AI</Link>
           <div className="tuco-account"><span className="tuco-account-avatar">{email.charAt(0).toUpperCase()}</span><span className="tuco-account-email">{email}</span></div>
           <button className="tuco-logout" onClick={logout}>Đăng xuất</button>
         </div>

@@ -83,3 +83,11 @@ Tài liệu chính thức:
 - Supabase SSR: https://supabase.com/docs/guides/auth/server-side
 - OpenAI Responses API: https://developers.openai.com/api/reference/responses/overview
 - OpenAI Structured Outputs: https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses
+
+## 9. Tuco Task Center (Bước 3)
+
+- Mở `/tasks` sau khi đăng nhập để xem tối đa 100 nhiệm vụ AI gần nhất.
+- Lọc nhiệm vụ theo trạng thái và tìm kiếm theo tiêu đề/loại nhiệm vụ.
+- Xem dữ liệu đầu vào, kết quả phân tích Gemini, điểm đánh giá, thông tin cần xác minh và các bản nháp được tạo.
+- Xem nhật ký hệ thống gắn với từng nhiệm vụ.
+- Trung tâm này chỉ đọc dữ liệu, không tự chạy lại tác vụ và không tiêu hao thêm quota Gemini.
