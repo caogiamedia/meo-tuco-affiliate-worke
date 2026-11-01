@@ -1,40 +1,114 @@
-'use client';
-import { useMemo, useState } from 'react';
-import type { FormEvent, ReactNode } from 'react';
-import { Activity, ArrowDownRight, ArrowUpRight, Bot, Boxes, CalendarClock, CheckCircle2, ChevronDown, CircleDollarSign, ClipboardList, ExternalLink, FileText, Image as ImageIcon, LayoutDashboard, Link2, Menu, MessageSquareText, MousePointerClick, Plus, Radio, Search, Send, Settings, ShieldCheck, Sparkles, Target, TrendingUp, Wallet, X } from 'lucide-react';
+import Link from 'next/link';
+import {
+  ArrowRight, ArrowUpRight, BookOpen, CalendarDays,
+  CheckCircle2, ChevronRight, CircleDollarSign, Heart,
+  Package, PawPrint, Search, ShieldCheck, Store, WandSparkles,
+} from 'lucide-react';
 
-type Product = { id:number; name:string; category:string; url:string; price:string; commission:string; status:'Đang quảng bá'|'Chờ duyệt'|'Đã nhập'; clicks:number };
-const initialProducts:Product[] = [
- {id:1,name:'Bỉm Gooby siêu mềm',category:'Mẹ & bé',url:'https://shopee.vn/',price:'189.000đ',commission:'8%',status:'Đang quảng bá',clicks:328},
- {id:2,name:'Khăn ướt Huggies',category:'Mẹ & bé',url:'https://shopee.vn/',price:'39.000đ',commission:'6%',status:'Đang quảng bá',clicks:214},
- {id:3,name:'Máy xay mini đa năng',category:'Gia dụng',url:'https://shopee.vn/',price:'159.000đ',commission:'10%',status:'Chờ duyệt',clicks:0},
+const rooms = [
+  { icon: Search, title: 'Phòng săn sản phẩm', desc: 'Tuco tìm và sàng lọc những món đồ đáng để giới thiệu.', tag: 'RESEARCH' },
+  { icon: WandSparkles, title: 'Xưởng sáng tạo', desc: 'Biến thông tin sản phẩm thành bài viết, hình ảnh và kịch bản video.', tag: 'CONTENT' },
+  { icon: CalendarDays, title: 'Lịch làm việc', desc: 'Theo dõi nội dung đã duyệt và những việc sắp đến giờ.', tag: 'SCHEDULE' },
+  { icon: CircleDollarSign, title: 'Quỹ nuôi sen', desc: 'Cập nhật click, đơn hàng và hoa hồng khi có nguồn dữ liệu xác thực.', tag: 'EARNINGS' },
 ];
-const nav=[['Tổng quan',LayoutDashboard],['AI Worker',Bot],['Kho Affiliate',Link2],['Chiến dịch',Target],['Content Studio',FileText],['Lịch xuất bản',CalendarClock],['Phân tích Traffic',MousePointerClick],['Đơn hàng & Hoa hồng',Wallet],['Nhật ký AI',ClipboardList],['Cài đặt',Settings]] as const;
-export default function Home(){
- const [active,setActive]=useState('Tổng quan'); const [products,setProducts]=useState(initialProducts); const [query,setQuery]=useState(''); const [showAdd,setShowAdd]=useState(false); const [newUrl,setNewUrl]=useState(''); const [newName,setNewName]=useState(''); const [notice,setNotice]=useState(''); const [mobileNav,setMobileNav]=useState(false);
- const filtered=useMemo(()=>products.filter(p=>(p.name+' '+p.category).toLowerCase().includes(query.toLowerCase())),[products,query]);
- function addProduct(e:FormEvent){e.preventDefault(); if(!newUrl.trim()||!newName.trim())return; setProducts(p=>[{id:Date.now(),name:newName,category:'Chưa phân loại',url:newUrl,price:'Chưa cập nhật',commission:'Chưa cập nhật',status:'Đã nhập',clicks:0},...p]); setNewName('');setNewUrl('');setShowAdd(false);setNotice('Đã thêm link vào kho. Cần kết nối AI/API để phân tích dữ liệu sản phẩm thực tế.');}
- return <main className="shell">
-  <aside className={`sidebar ${mobileNav?'open':''}`}><div className="brand"><div className="brand-mark"><img src="/tuco.png" alt="Mèo Tuco"/></div><div><b>MÈO TUCO</b><small>KIẾM TIỀN NUÔI SEN !</small></div><button className="mobile-close" onClick={()=>setMobileNav(false)}><X/></button></div>
-   <div className="worker-card"><div className="mascot"><img src="/tuco.png" alt="Mèo Tuco"/></div><div className="worker-info"><b>Mèo Tuco</b><span><i className="pulse"/> Đang trực tuyến</span></div><span className="dots">•••</span><p>Hôm nay mình sẽ tìm cách đưa sản phẩm của bạn đến đúng khách hàng!</p></div>
-   <div className="nav-label">WORKSPACE</div><nav>{nav.map(([label,Icon])=><button key={label} className={`nav-item ${active===label?'selected':''}`} onClick={()=>{setActive(label);setMobileNav(false)}}><Icon size={17}/><span>{label}</span>{label==='AI Worker'&&<i className="nav-dot"/>}</button>)}</nav>
-   <div className="sidebar-bottom"><div className="plan"><Sparkles size={16}/><div><b>AI Workspace</b><small>Chế độ thử nghiệm</small></div></div><div className="profile"><div className="avatar">A</div><div><b>Administrator</b><small>Quản trị viên</small></div><ChevronDown size={15}/></div></div>
-  </aside>
-  <section className="main"><header className="topbar"><button className="mobile-menu" onClick={()=>setMobileNav(true)}><Menu/></button><div className="crumb">Workspace <span>/</span> <b>{active}</b></div><div className="top-actions"><span className="system"><i className="pulse"/> Hệ thống hoạt động</span><button className="icon-btn" title="Thông báo"><Radio size={18}/><i/></button><div className="avatar small">A</div></div></header>
-   <div className="content"><div className="welcome"><div><div className="eyebrow"><Sparkles size={14}/> YOUR AI SALES TEAM</div><h1>Xin chào! <span>Hôm nay kiếm tiền nhé.</span></h1><p>Đây là trung tâm điều hành đội ngũ AI Affiliate của bạn.</p></div><button className="primary" onClick={()=>setShowAdd(true)}><Plus size={17}/> Thêm link Affiliate</button></div>
-   {notice&&<div className="notice"><CheckCircle2 size={17}/>{notice}<button onClick={()=>setNotice('')}><X size={15}/></button></div>}
-   <div className="demo-banner"><ShieldCheck size={17}/><span><b>Chế độ giao diện MVP:</b> Số liệu đang là dữ liệu minh họa. Chưa có kết nối Shopee, AI API hoặc tài khoản mạng xã hội nên chưa phát sinh hoạt động bán hàng thật.</span></div>
-   <div className="section-head"><div><h2>Tổng quan hiệu suất</h2><p>Theo dõi các chỉ số Affiliate của bạn</p></div><button className="date-filter">30 ngày gần nhất <ChevronDown size={15}/></button></div>
-   <div className="stats"><Stat icon={<MousePointerClick/>} label="Tổng lượt click" value="542" change="Traffic demo" tone="orange"/><Stat icon={<ShoppingIcon/>} label="Đơn hàng" value="0" change="Chưa đồng bộ Shopee" tone="blue"/><Stat icon={<CircleDollarSign/>} label="Hoa hồng dự kiến" value="0đ" change="Chưa có dữ liệu" tone="purple"/><Stat icon={<Wallet/>} label="Đã thanh toán" value="0đ" change="Tiền thực nhận" tone="green"/></div>
-   <div className="grid-main"><div className="panel performance"><div className="panel-head"><div><h3>Hiệu suất Affiliate</h3><p>Lượt click và chuyển đổi theo thời gian</p></div><button className="more">•••</button></div><div className="chart-legend"><span><i className="legend-orange"/> Lượt click</span><span><i className="legend-blue"/> Đơn hàng</span></div><div className="chart"><div className="y-labels"><span>600</span><span>450</span><span>300</span><span>150</span><span>0</span></div><div className="chart-area"><div className="grid-lines"><i/><i/><i/><i/><i/></div><svg viewBox="0 0 700 210" preserveAspectRatio="none" className="plot"><defs><linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#f28a36" stopOpacity=".22"/><stop offset="1" stopColor="#f28a36" stopOpacity="0"/></linearGradient></defs><path d="M0 175 C45 160 50 140 95 150 S160 115 195 130 S250 90 290 110 S350 80 390 100 S450 65 490 80 S550 40 590 66 S650 32 700 22 L700 210 L0 210Z" fill="url(#fill)"/><path d="M0 175 C45 160 50 140 95 150 S160 115 195 130 S250 90 290 110 S350 80 390 100 S450 65 490 80 S550 40 590 66 S650 32 700 22" fill="none" stroke="#ed8735" strokeWidth="3" strokeLinecap="round"/></svg><div className="x-labels"><span>01/10</span><span>05/10</span><span>10/10</span><span>15/10</span><span>20/10</span><span>25/10</span><span>30/10</span></div></div></div></div>
-    <div className="panel agent-panel"><div className="panel-head"><div><h3>AI Worker</h3><p>Trạng thái nhân viên AI</p></div><span className="tag tag-warn">Chưa kết nối</span></div><div className="agent-hero"><div className="agent-face"><img src="/tuco.png" alt="Mèo Tuco"/></div><div><b>Mèo Tuco</b><span>Trợ lý bán hàng của bạn</span></div></div><div className="agent-task"><div className="task-icon"><Activity size={17}/></div><div><b>Chờ cấu hình nhiệm vụ</b><small>Kết nối AI để bắt đầu làm việc</small></div></div><button className="outline full" onClick={()=>setActive('AI Worker')}>Thiết lập AI Worker <ArrowUpRight size={16}/></button></div></div>
-   <div className="lower-grid"><div className="panel products"><div className="panel-head"><div><h3>Kho sản phẩm Affiliate</h3><p>Quản lý link sản phẩm bạn cung cấp</p></div><button className="text-btn" onClick={()=>setActive('Kho Affiliate')}>Xem tất cả <ArrowUpRight size={15}/></button></div><div className="table-tools"><div className="search"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tìm sản phẩm..."/></div><button className="outline" onClick={()=>setShowAdd(true)}><Plus size={15}/> Thêm link</button></div><div className="table-wrap"><table><thead><tr><th>SẢN PHẨM</th><th>GIÁ</th><th>HOA HỒNG</th><th>CLICK</th><th>TRẠNG THÁI</th><th></th></tr></thead><tbody>{filtered.map(p=><tr key={p.id}><td><div className="product-cell"><div className="product-thumb"><Boxes size={18}/></div><div><b>{p.name}</b><small>{p.category}</small></div></div></td><td>{p.price}</td><td>{p.commission}</td><td>{p.clicks.toLocaleString('vi-VN')}</td><td><span className={`status ${p.status==='Đang quảng bá'?'live':p.status==='Chờ duyệt'?'pending':'new'}`}>{p.status}</span></td><td><a href={p.url} target="_blank" rel="noreferrer" title="Mở link"><ExternalLink size={15}/></a></td></tr>)}</tbody></table>{filtered.length===0&&<div className="empty">Chưa có sản phẩm phù hợp.</div>}</div></div>
-    <div className="panel journal"><div className="panel-head"><div><h3>Nhật ký AI</h3><p>Hoạt động gần đây</p></div><button className="more">•••</button></div><div className="journal-empty"><div className="journal-icon"><MessageSquareText size={22}/></div><b>Chưa có nhật ký thực tế</b><p>Nhật ký sẽ xuất hiện khi AI Agent được kết nối và thực thi nhiệm vụ.</p></div><button className="text-btn" onClick={()=>setActive('Nhật ký AI')}>Mở nhật ký <ArrowUpRight size={15}/></button></div></div>
-   <footer>Mèo Tuco kiếm tiền nuôi sen ! <span>•</span> MVP 0.2.0 <span className="footer-right">Minh bạch dữ liệu · Hoạt động có kiểm soát</span></footer>
-   </div>
-  </section>
-  {showAdd&&<div className="modal-backdrop" onClick={()=>setShowAdd(false)}><form className="modal" onSubmit={addProduct} onClick={e=>e.stopPropagation()}><div className="modal-head"><div><span className="eyebrow">PRODUCT IMPORT</span><h2>Thêm link Affiliate</h2></div><button type="button" className="icon-btn" onClick={()=>setShowAdd(false)}><X/></button></div><label>Tên sản phẩm<input required value={newName} onChange={e=>setNewName(e.target.value)} placeholder="Ví dụ: Bỉm Gooby quần size L"/></label><label>Link Affiliate Shopee<input required type="url" value={newUrl} onChange={e=>setNewUrl(e.target.value)} placeholder="https://..."/></label><div className="modal-note"><ShieldCheck size={16}/> Link được lưu làm dữ liệu đầu vào. Giá, hoa hồng và thông tin sản phẩm chỉ được xác thực sau khi kết nối nguồn dữ liệu phù hợp.</div><div className="modal-actions"><button type="button" className="outline" onClick={()=>setShowAdd(false)}>Hủy</button><button className="primary" type="submit"><Plus size={16}/> Lưu sản phẩm</button></div></form></div>}
- </main>
+
+const steps = [
+  ['01', 'Sen gửi link', 'Thêm link sản phẩm affiliate vào kho của Tuco.'],
+  ['02', 'Tuco nghiên cứu', 'AI phân tích dữ liệu sen cung cấp và đề xuất góc tiếp cận.'],
+  ['03', 'Sen duyệt nội dung', 'Sen xem, sửa, duyệt hoặc từ chối trước khi xuất bản.'],
+  ['04', 'Theo dõi kết quả', 'Lưu lịch sử công việc và cập nhật số liệu khi được kết nối.'],
+];
+
+export default function Home() {
+  return (
+    <main className="tuco-public">
+      <header className="tp-header">
+        <Link href="/" className="tp-brand" aria-label="Mèo Tuco - Trang chủ">
+          <span className="tp-brand-avatar"><img src="/tuco.png" alt="" /></span>
+          <span><strong>MÈO TUCO</strong><small>KIẾM TIỀN NUÔI SEN !</small></span>
+        </Link>
+        <nav className="tp-nav" aria-label="Điều hướng chính">
+          <a href="#cau-chuyen">Chuyện của Tuco</a>
+          <a href="#van-phong">Văn phòng</a>
+          <a href="#quy-trinh">Cách Tuco làm việc</a>
+          <a href="#nhat-ky">Nhật ký</a>
+        </nav>
+        <div className="tp-header-actions">
+          <Link href="/login" className="tp-login">Sen đăng nhập <ArrowUpRight size={15} /></Link>
+        </div>
+      </header>
+
+      <section className="tp-hero" id="cau-chuyen">
+        <div className="tp-hero-copy">
+          <div className="tp-kicker"><span className="tp-kicker-dot" /> MỘT CHÚ MÈO, MỘT ƯỚC MƠ LỚN</div>
+          <h1>Sen cứ chill,<br /><em>để Tuco lo!</em></h1>
+          <p className="tp-lead">Xin chào, mình là Tuco — nhân viên affiliate bốn chân. Mình thích săn đồ hay, kể chuyện sản phẩm và chăm chỉ tích góp để nuôi sen.</p>
+          <div className="tp-hero-buttons">
+            <a className="tp-button tp-button-primary" href="#van-phong">Khám phá nhà Tuco <ArrowRight size={17} /></a>
+            <Link className="tp-button tp-button-quiet" href="/login">Vào phòng điều khiển <ChevronRight size={16} /></Link>
+          </div>
+          <div className="tp-hero-note"><ShieldCheck size={16} /> Minh bạch hoạt động · Sen duyệt trước khi đăng</div>
+        </div>
+        <div className="tp-hero-art">
+          <div className="tp-sun" />
+          <div className="tp-doodle tp-doodle-one">✦</div><div className="tp-doodle tp-doodle-two">♡</div>
+          <div className="tp-speech"><span>Meo meo!</span><br />Hôm nay mình<br />kiếm gì cho sen nhỉ?</div>
+          <div className="tp-cat-stage"><img src="/tuco.png" alt="Tuco, chú mèo nhân viên affiliate" /></div>
+          <div className="tp-stage-label"><PawPrint size={15} /> TUCO’S LITTLE OFFICE</div>
+        </div>
+        <div className="tp-hero-bottom"><span>SCROLL ĐỂ KHÁM PHÁ</span><span className="tp-scroll-line" /></div>
+      </section>
+
+      <section className="tp-intro-strip">
+        <div><span className="tp-strip-icon"><Heart size={19} /></span><p><b>Không chỉ là một website bán hàng.</b><br />Đây là câu chuyện mỗi ngày của một chú mèo AI đang cố gắng kiếm tiền nuôi sen.</p></div>
+        <span className="tp-strip-stamp">MEOW<br />& MAKE<br />MONEY</span>
+      </section>
+
+      <section className="tp-section tp-office-section" id="van-phong">
+        <div className="tp-section-heading">
+          <div><span className="tp-eyebrow">WELCOME TO TUCO’S WORLD</span><h2>Văn phòng nhỏ,<br /><em>ước mơ không nhỏ.</em></h2></div>
+          <p>Mỗi căn phòng là một nhiệm vụ. Tuco sẽ làm việc, ghi nhật ký và báo cáo rõ ràng để sen luôn nắm được mọi thứ.</p>
+        </div>
+        <div className="tp-room-grid">
+          {rooms.map((room, index) => {
+            const Icon = room.icon;
+            return <article className={`tp-room-card tp-room-${index + 1}`} key={room.tag}>
+              <div className="tp-room-top"><span className="tp-room-icon"><Icon size={22} /></span><span className="tp-room-tag">{room.tag}</span></div>
+              <h3>{room.title}</h3><p>{room.desc}</p>
+              <span className="tp-room-number">0{index + 1}</span>
+              <Link href="/login" className="tp-room-link">Vào phòng <ArrowUpRight size={16} /></Link>
+            </article>;
+          })}
+        </div>
+      </section>
+
+      <section className="tp-process-section" id="quy-trinh">
+        <div className="tp-process-inner">
+          <div className="tp-process-heading"><span className="tp-eyebrow">TEAMWORK MAKES THE DREAM WORK</span><h2>Tuco chăm chỉ.<br /><em>Sen nắm quyền.</em></h2><p>Tuco chủ động đề xuất công việc, nhưng những bước quan trọng vẫn cần cái gật đầu của sen.</p></div>
+          <div className="tp-steps">{steps.map(([number, title, desc]) => <article className="tp-step" key={number}><span>{number}</span><div><h3>{title}</h3><p>{desc}</p></div><CheckCircle2 size={18} /></article>)}</div>
+        </div>
+      </section>
+
+      <section className="tp-journal-section" id="nhat-ky">
+        <div className="tp-journal-card">
+          <div className="tp-journal-mascot"><img src="/tuco.png" alt="Tuco" /></div>
+          <div className="tp-journal-copy"><span className="tp-eyebrow">TUCO’S DIARY</span><h2>Nhật ký của một<br /><em>nhân viên chăm chỉ.</em></h2><p>Mỗi lần Tuco tìm sản phẩm, tạo nội dung hay hoàn thành nhiệm vụ, câu chuyện sẽ được lưu lại tại đây — để sen và mọi người cùng theo dõi.</p><div className="tp-empty-journal"><BookOpen size={17} /><span>Nhật ký sẽ xuất hiện khi Tuco có hoạt động được ghi nhận.</span></div></div>
+          <div className="tp-journal-doodle">Z<br /><small>z</small></div>
+        </div>
+      </section>
+
+      <section className="tp-store-teaser">
+        <div className="tp-store-icon"><Store size={25} /></div>
+        <div><span className="tp-eyebrow">TUCO’S PICKS</span><h2>Góc đồ hay Tuco muốn chia sẻ</h2><p>Những sản phẩm được Tuco nghiên cứu và chọn lọc sẽ có mặt tại siêu thị nhỏ này sau khi được sen duyệt.</p></div>
+        <div className="tp-store-coming"><Package size={18} /><span>Đang chuẩn bị mở cửa</span></div>
+      </section>
+
+      <footer className="tp-footer">
+        <Link href="/" className="tp-brand"><span className="tp-brand-avatar"><img src="/tuco.png" alt="" /></span><span><strong>MÈO TUCO</strong><small>KIẾM TIỀN NUÔI SEN !</small></span></Link>
+        <p>Được làm bằng tình yêu, vài chiếc máy tính và rất nhiều tiếng meo.</p>
+        <div className="tp-footer-links"><Link href="/login">Phòng điều khiển</Link><a href="#cau-chuyen">Về đầu trang ↑</a></div>
+        <small className="tp-copyright">© {new Date().getFullYear()} Mèo Tuco. Affiliate minh bạch, nội dung có kiểm duyệt.</small>
+      </footer>
+    </main>
+  );
 }
-function Stat({icon,label,value,change,tone}:{icon:ReactNode,label:string,value:string,change:string,tone:string}){return <div className="stat"><div className={`stat-icon ${tone}`}>{icon}</div><span className="stat-label">{label}</span><strong>{value}</strong><small>{change}</small></div>}
-function ShoppingIcon(){return <Boxes/>}

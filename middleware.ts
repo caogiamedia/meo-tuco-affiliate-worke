@@ -1,10 +1,12 @@
-
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const pathname = request.nextUrl.pathname;
+  // Trang chủ là sân nhà công khai; các khu vực vận hành vẫn cần đăng nhập.
+  if (pathname === '/') return NextResponse.next();
 
+  let response = NextResponse.next({ request });
   type CookieToSet = {
     name: string;
     value: string;
@@ -16,40 +18,30 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-
+        getAll() { return request.cookies.getAll(); },
         setAll(cookiesToSet: CookieToSet[]) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
-
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
-
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        }
-      }
-    }
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    },
   );
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  const isLogin = request.nextUrl.pathname.startsWith('/login');
+  const { data: { user } } = await supabase.auth.getUser();
+  const isLogin = pathname.startsWith('/login');
 
   if (!user && !isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
+    url.searchParams.set('next', pathname);
     return NextResponse.redirect(url);
   }
 
   if (user && isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = '/agent';
+    url.search = '';
     return NextResponse.redirect(url);
   }
 
@@ -57,7 +49,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
-  ]
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 };
